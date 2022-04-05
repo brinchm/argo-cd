@@ -5,12 +5,10 @@ import (
 	"fmt"
 
 	"github.com/microsoft/azure-devops-go-api/azuredevops"
-	"github.com/microsoft/azure-devops-go-api/azuredevops/core"
 	azureGit "github.com/microsoft/azure-devops-go-api/azuredevops/git"
 )
 
 type AzureDevopsProvider struct {
-	client       *core.Client
 	connection   *azuredevops.Connection
 	organization string
 	teamProject  string
@@ -26,12 +24,7 @@ func NewAzureDevopsProvider(ctx context.Context, accessToken string, org string,
 
 	url := fmt.Sprintf("https://dev.azure.com/%s", org)
 	connection := azuredevops.NewPatConnection(url, accessToken)
-	coreClient, err := core.NewClient(ctx, connection)
-	if err != nil {
-		return nil, err
-	}
-
-	return &AzureDevopsProvider{organization: org, teamProject: project, accessToken: accessToken, client: &coreClient, connection: connection}, nil
+	return &AzureDevopsProvider{organization: org, teamProject: project, accessToken: accessToken, connection: connection}, nil
 }
 
 func (g *AzureDevopsProvider) ListRepos(ctx context.Context, cloneProtocol string) ([]*Repository, error) {
