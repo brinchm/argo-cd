@@ -77,6 +77,15 @@ func (g *SCMProviderGenerator) GenerateParams(appSetGenerator *argoprojiov1alpha
 		if err != nil {
 			return nil, fmt.Errorf("error initializing Gitlab service: %v", err)
 		}
+	} else if providerConfig.AzureDevops != nil {
+		token, err := g.getSecretRef(ctx, providerConfig.AzureDevops.AccessTokenRef, applicationSetInfo.Namespace)
+		if err != nil {
+			return nil, fmt.Errorf("error fetching Azure Devops access token: %v", err)
+		}
+		provider, err = scm_provider.NewAzureDevopsProvider(ctx, token, providerConfig.AzureDevops.Organization, providerConfig.AzureDevops.TeamProject)
+		if err != nil {
+			return nil, fmt.Errorf("error initializing Azure Devops service: %v", err)
+		}
 	} else {
 		return nil, fmt.Errorf("no SCM provider implementation configured")
 	}
