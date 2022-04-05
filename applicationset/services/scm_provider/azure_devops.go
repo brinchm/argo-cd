@@ -47,13 +47,16 @@ func (g *AzureDevopsProvider) ListRepos(ctx context.Context, cloneProtocol strin
 	}
 	repos := []*Repository{}
 	for _, azureRepo := range *azureRepos {
+		if azureRepo.DefaultBranch == nil {
+			continue
+		}
 		repos = append(repos, &Repository{
 			Organization: g.organization,
 			Repository:   *azureRepo.Name,
 			URL:          *azureRepo.RemoteUrl,
 			Branch:       *azureRepo.DefaultBranch,
 			Labels:       []string{},
-			RepositoryId: *&azureRepo.Id,
+			RepositoryId: *azureRepo.Id,
 		})
 	}
 
@@ -93,7 +96,7 @@ func (g *AzureDevopsProvider) GetBranches(ctx context.Context, repo *Repository)
 	getBranchesRequest := azureGit.GetBranchesArgs{RepositoryId: &repo.Repository, Project: &g.teamProject}
 	branches, err := gitClient.GetBranches(ctx, getBranchesRequest)
 	if err != nil {
-		return nil, err
+		return []*Repository{}, nil
 	}
 	repos := []*Repository{}
 	for _, azureBranch := range *branches {
