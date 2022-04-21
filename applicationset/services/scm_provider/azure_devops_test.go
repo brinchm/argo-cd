@@ -54,6 +54,12 @@ func TestAzureDevopsRepoHasPath(t *testing.T) {
 			azureDevopsError: azuredevops.WrappedError{TypeKey: s("GitItemNotFoundException")},
 		},
 		{
+			name:             "repo_has_path_not_found_other_azure_devops_error_returns_error",
+			pathFound:        false,
+			azureDevopsError: azuredevops.WrappedError{TypeKey: s("OtherAzureDevopsException")},
+			returnError:      true,
+		},
+		{
 			name:             "repo_has_path_not_found_other_error_returns_error",
 			pathFound:        false,
 			azureDevopsError: fmt.Errorf("Undefined error from Azure Devops"),
@@ -106,7 +112,7 @@ func TestAzureDevopsGetBranches(t *testing.T) {
 		expectedError       error
 	}{
 		{
-			name:             "get_branches1",
+			name:             "get_branches_single_branch_returns_branch",
 			expectedBranches: []azureGit.GitBranchStats{{Name: s("feature-feat1"), Commit: &azureGit.GitCommitRef{CommitId: s("abc123233223")}}},
 		},
 		{
@@ -114,14 +120,14 @@ func TestAzureDevopsGetBranches(t *testing.T) {
 			getBranchesApiError: fmt.Errorf("Remote Azure Devops GetBranches error"),
 		},
 		{
-			name: "no_branches_returned",
+			name: "get_branches_no_branches_returned",
 		},
 		{
-			name:          "get_client_fails",
+			name:          "get_branches_get_client_fails",
 			expectedError: fmt.Errorf("Could not get Azure Devops API client"),
 		},
 		{
-			name: "get_multiple_branches",
+			name: "get_branches_multiple_branches_returns_branches",
 			expectedBranches: []azureGit.GitBranchStats{
 				{Name: s("feature-feat1"), Commit: &azureGit.GitCommitRef{CommitId: s("abc123233223")}},
 				{Name: s("feature/feat2"), Commit: &azureGit.GitCommitRef{CommitId: s("4334")}},
@@ -184,35 +190,35 @@ func TestGetAzureDevopsRepositories(t *testing.T) {
 		expectedNumberOfRepos int
 	}{
 		{
-			name:         "AzureDevops_Successful_Repo_List",
+			name:         "get_repositories_single_repo_returns_repo",
 			repositories: []azureGit.GitRepository{{Name: s("repo1"), DefaultBranch: s("main"), RemoteUrl: s("https://remoteurl.u"), Id: &uuidHolder.uuid}},
 		},
 		{
-			name:                "AzureDevops_Repo_Without_Default_Branch",
+			name:                "get_repositories_repo_without_default_branch_returns_empty",
 			repositories:        []azureGit.GitRepository{{Name: s("repo2"), RemoteUrl: s("https://remoteurl.u"), Id: &uuidHolder.uuid}},
 			expectEmptyRepoList: true,
 		},
 		{
-			name:                 "AzureDevops_GetRepositories_Fails",
+			name:                 "get_repositories_fails_returns_error",
 			getRepositoriesError: fmt.Errorf("Could not get repos"),
 		},
 		{
-			name:                "AzureDevops_Repo_Without_Name_Not_Returned",
+			name:                "get_repositories_repo_without_name_returns_empty",
 			repositories:        []azureGit.GitRepository{{DefaultBranch: s("main"), RemoteUrl: s("https://remoteurl.u"), Id: &uuidHolder.uuid}},
 			expectEmptyRepoList: true,
 		},
 		{
-			name:                "AzureDevops_Repo_Without_RemoteUrl_Not_Returned",
+			name:                "get_repositories_repo_without_remoteurl_returns_empty",
 			repositories:        []azureGit.GitRepository{{DefaultBranch: s("main"), Name: s("repo_name"), Id: &uuidHolder.uuid}},
 			expectEmptyRepoList: true,
 		},
 		{
-			name:                "AzureDevops_Repo_Without_Id_Not_Returned",
+			name:                "get_repositories_repo_without_id_returns_empty",
 			repositories:        []azureGit.GitRepository{{DefaultBranch: s("main"), Name: s("repo_name"), RemoteUrl: s("https://remoteurl.u")}},
 			expectEmptyRepoList: true,
 		},
 		{
-			name: "AzureDevops_Partial_Repo_List",
+			name: "get_repositories_multiple_results_returns_eligible",
 			repositories: []azureGit.GitRepository{
 				{Name: s("returned1"), DefaultBranch: s("main"), RemoteUrl: s("https://remoteurl.u"), Id: &uuidHolder.uuid},
 				{Name: s("missing_default_branch"), RemoteUrl: s("https://remoteurl.u"), Id: &uuidHolder.uuid},
