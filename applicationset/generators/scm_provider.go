@@ -101,7 +101,6 @@ func (g *SCMProviderGenerator) GenerateParams(appSetGenerator *argoprojiov1alpha
 		if scmError != nil {
 			return nil, fmt.Errorf("error initializing Bitbucket Server service: %v", scmError)
 		}
-
 	} else if providerConfig.AzureDevops != nil {
 		token, err := g.getSecretRef(ctx, providerConfig.AzureDevops.AccessTokenRef, applicationSetInfo.Namespace)
 		if err != nil {
