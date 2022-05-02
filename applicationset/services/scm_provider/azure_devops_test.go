@@ -79,8 +79,6 @@ func TestAzureDevopsRepoHasPath(t *testing.T) {
 
 			provider := AzureDevopsProvider{organization: organization, teamProject: teamProject, clientFactory: clientFactoryMock}
 
-			//getItemArgs := azureGit.GetItemArgs{RepositoryId: &idAsString, Project: &g.teamProject, Path: &path, VersionDescriptor: &azureGit.GitVersionDescriptor{Version: &branchName}}
-
 			repo := &Repository{Organization: organization, Repository: repoName, RepositoryId: uuidHolder.uuid, Branch: branchName}
 			hasPath, err := provider.RepoHasPath(ctx, repo, path)
 
